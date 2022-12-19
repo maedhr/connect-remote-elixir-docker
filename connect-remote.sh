@@ -20,7 +20,7 @@ USER_SERVER=$1
 CONTAINER=$2
 REMOTE_NODE_NAME=$3
 
-: ${DOCKER_BRIDGE_IP:=172.17.0.1}
+: ${DOCKER_BRIDGE_IP:=172.18.0.1}
 : ${LOCAL_NODE_NAME:=my-laptop}
 : ${ERLANG_COOKIE:=mycookie}
 
@@ -33,9 +33,8 @@ ssh -f -o ExitOnForwardFailure=yes $USER_SERVER \
   echo 'Sleeping for 1 second to wait for local IEx session' &&
   sleep 1 &&
   echo -n 'Remote: connecting to remote node to local node...' &&
-  docker exec $CONTAINER \
-    elixir --name temp@127.0.0.1 --cookie $ERLANG_COOKIE \
-      -e $ELIXIR $REMOTE_NODE_NAME $LOCAL_NODE_NAME $DOCKER_BRIDGE_IP &&
+  sudo docker exec $CONTAINER bin/chargebee_hubspot_sync rpc 'Node.connect(:\"$LOCAL_NODE_NAME@$DOCKER_BRIDGE_IP\")' \
+
   sleep 5
 "
 echo "Done"
