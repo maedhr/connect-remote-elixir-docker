@@ -20,11 +20,10 @@ USER_SERVER=$1
 CONTAINER=$2
 REMOTE_NODE_NAME=$3
 
-: ${DOCKER_BRIDGE_IP:=172.18.0.1}
 : ${LOCAL_NODE_NAME:=my-laptop}
 : ${ERLANG_COOKIE:=mycookie}
 
-ELIXIR="'$(cat ${BASH_SOURCE%/*}/connect_remote.ex)'"
+DOCKER_BRIDGE_IP=`ssh $USER_SERVER "sudo docker inspect $CONTAINER --format '{{range .NetworkSettings.Networks}}{{.Gateway}}{{end}}'"`
 
 echo -n "Creating tunnel..."
 ssh -f -o ExitOnForwardFailure=yes $USER_SERVER \
