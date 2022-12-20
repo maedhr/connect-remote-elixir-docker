@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
-if [ $# -ne 3 ] || [ "$1" == "-h" ]; then
-  echo "Usage: $0 USER@SERVER CONTAINER_NAME NODE_NAME"
+if [ $# -ne 4 ] || [ "$1" == "-h" ]; then
+  echo "Usage: $0 USER@SERVER CONTAINER_NAME NODE_NAME APP_CONTROL_SCRIPT"
   echo
   echo "Creates a local IEx session that is connected to a remote node running under docker"
   echo
@@ -19,6 +19,7 @@ fi
 USER_SERVER=$1
 CONTAINER=$2
 REMOTE_NODE_NAME=$3
+APP_CONTROL_SCRIPT_NAME=$4
 
 : ${LOCAL_NODE_NAME:=my-laptop}
 : ${ERLANG_COOKIE:=mycookie}
@@ -32,7 +33,7 @@ ssh -f -o ExitOnForwardFailure=yes $USER_SERVER \
   echo 'Sleeping for 1 second to wait for local IEx session' &&
   sleep 1 &&
   echo -n 'Remote: connecting to remote node to local node...' &&
-  sudo docker exec $CONTAINER bin/chargebee_hubspot_sync rpc 'Node.connect(:\"$LOCAL_NODE_NAME@$DOCKER_BRIDGE_IP\")' \
+  sudo docker exec $CONTAINER bin/$APP_CONTROL_SCRIPT_NAME rpc 'Node.connect(:\"$LOCAL_NODE_NAME@$DOCKER_BRIDGE_IP\")' \
 
   sleep 5
 "
